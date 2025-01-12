@@ -1,8 +1,4 @@
-# Clean raw data then run SuperLearner algorithm to predict missing rehab outcome data at t0 based on background factors
-# includes multiple imputations of missing data in background factors
-# also includes calculation of attrition weights (if removing observations of missing values)
-
-# HDR ----
+# header ----
 
 rm(list=ls())
 
@@ -35,7 +31,7 @@ plot_imp <- FALSE
 # ""99"" = ""Autre"" ; 
 # "8888"" = ""Non demandé durant l'entretien""
 
-
+# outcome
 varOI <- "WEMWBS_TOT_NB"#"EGF" STORI_CONSCIENCE
 
 path="C:/Users/Guillaume/Desktop/All projects/Gal REHABASE Fdam HORIZONS/Explore REHABase/"
@@ -58,32 +54,9 @@ set.seed(123)
 source("C:/Users/Guillaume/Desktop/All projects/ML/SL_predict_caret_adaptive.R")
 #source("/bettik/barbalag/missing_data/SL_predict_caret_adaptive.R")
 
-SL.library <- list("SL.mean",
-                   c("SL.caret.xgboost", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.caret.ranger", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.gam_cts", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.rpart", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.caret.naive_bayes", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.caret.earth", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.glm", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.glmnet_1", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.glmnet_0.5", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"),
-                   c("SL.glmnet_0", "All", "screen.mixed", "screen.glmnet", "screen.randomForest")
-)
-
-SL.library <- list(c("SL.step.interaction",  "All","screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.step.interaction",  "screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.ksvm", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
 SL.library <- list(c("SL.caret.glmnet", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.earth", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.rpart", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.bartMachine", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.gam_cts",  "All"))
-SL.library <- list(c("SL.caret.glm", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
-SL.library <- list(c("SL.caret.ranger", "screen.randomForest"))
-SL.library <- list(c("SL.caret.rpart", "All"))
 
-# First, let's create a function to categorize addiction values
+# Function to categorize addiction values
 categorize_addiction <- function(x) {
   if (is.na(x) || x == "") return(NA)
   if (x == "0") return("none")
@@ -106,23 +79,23 @@ categorize_med <- function(data, class_name, med_class) {
     mutate(!!class_name := 1)
 }
 
-#Function to find missing values
-try_missing <- function(merged_basicRegp) {
-  (miss_var_summary_obs <-naniar::miss_var_summary(merged_basicRegp)); print(miss_var_summary_obs)
-  (miss_var_table_obs <- naniar::miss_var_table(merged_basicRegp) %>%
-      mutate(pct_miss_in_var=n_miss_in_var*100/nrow(merged_basicRegp), .after=n_miss_in_var))
+#Function to better understand missing values using naniar
+try_missing <- function(data) {
+  (miss_var_summary_obs <-naniar::miss_var_summary(data)); print(miss_var_summary_obs)
+  (miss_var_table_obs <- naniar::miss_var_table(data) %>%
+      mutate(pct_miss_in_var=n_miss_in_var*100/nrow(data), .after=n_miss_in_var))
   print(miss_var_table_obs)
-  (miss_case_summary_obs <- naniar::miss_case_summary(merged_basicRegp))
+  (miss_case_summary_obs <- naniar::miss_case_summary(data))
   print(miss_case_summary_obs)
-  (miss_case_table_obs <- naniar::miss_case_table(merged_basicRegp) %>%
-      mutate(pct_miss_in_case=n_miss_in_case*100/ncol(merged_basicRegp), .after=n_miss_in_case) %>%
+  (miss_case_table_obs <- naniar::miss_case_table(data) %>%
+      mutate(pct_miss_in_case=n_miss_in_case*100/ncol(data), .after=n_miss_in_case) %>%
       arrange(desc(pct_miss_in_case))
   )
   print(miss_case_table_obs)
   return(miss_case_summary_obs)
 }
 
-# Function to calculate FMI
+# Function to calculate LAMBDA and FMI
 calculate_fmi <- function(imp, formula) {
   m <- imp$m  # number of imputations
   n <- nrow(imp$data)#sample size
@@ -165,19 +138,10 @@ calculate_fmi <- function(imp, formula) {
 }
 
 
-# PRE-PROCESSING ----
+# Extract data ----
 extract02012023=read.csv(paste0(path,"extract02012023.csv"), sep=";",encoding="UTF-8",fileEncoding="latin1")
-colnames(extract02012023)
-unique(extract02012023$StudySubjectID)
-unique(extract02012023$TIME)
-unique(extract02012023$SEXE)
-unique(extract02012023$LANGMAT)
-unique(extract02012023$NIVETUD_cat)
-unique(extract02012023$LISTE_CLASSE_DIAG1R)
-unique(extract02012023$LISTE_DIAG1R)
-unique(extract02012023$LISTE_CLASSE_DIAG2R_1)
-unique(extract02012023$NIVETUD_cat)
 
+# Define variables ----
 dx_to_keep <- c("2-Spectre de la SCHIZOPHRENIE","1-Troubles NEURODEVELOPPEMENTAUX",#"16-Troubles ADDICTIFS"  ,                         
              "18-Troubles de la PERSONNALITE","4-Troubles DEPRESSIFS","anxiety disorders" ,                       
              "3-Troubles BIPOLAIRES" 
@@ -190,7 +154,8 @@ col_to_keep <- c(
               "AGE_MEDSOC",
               "SEXE",
               "NIVETUD_cat",
-              #"LISTE_CLASSE_DIAG1R",#if anal only in one dx group
+              #"LISTE_CLASSE_DIAG1R",#not if anal only in one dx group
+              
               "COMOR_PSY", 
               "FGA", "SGA", "noRx",#"ANX", "THY", "ATD", 
               "addict",
@@ -208,75 +173,26 @@ col_to_keep <- c(
               "MARGIN", "MARGIN_ACTPASS",
               "ATCD_MEDLEG",
               
-              # item based
-              # "SQOL18_RELFAM_SATISF","SQOL18_AMIS_SATISF","SQOL18_VIESENTIM_SATISF",#phy, psy, res, sel
-              # "SQOL18_AUTONOMIE_SATISF",#"SQOL18_AUTONOMIE_SATISF","SQOL18_RELFAM_SATISF",	"SQOL18_AMIS_SATISF",	"SQOL18_VIESENTIM_SATISF",
-              # #"SERS_SC_TOT",	#"SERS_POS",	
-              # "IS_BIRCHWOOD_SC_TOT",#"IS_BIRCHWOOD_TTT",
-              # "MARS_TOT",
-              # "ISMI_SC_TOT",	#"ISMI_ALIEN",	
-              # #"STORI_ST_RETABLISSEMENT",
-              # "WEMWBS_TOT_NB",
-              # #EAS
-              
-              #"MEMCHIF_MCD",#
-              #"MEMCHIF_MCI",	
-              
               "missing_out" #outcome
               )
 
 #var to be transformed
 old_var <- c(  
-               # "SOMA_1",
-               # "addict",
-               # "ATCD_MEDLEG",
-               
                "MARGIN","MARGIN_ACTPASS",
                
-               #"DUREE_MALADIE",
-               #"NBR_HOSPI", 
-               #"DUREE_HOSPI",
-               
                "FGA", "SGA", "noRx"#"ANX", "THY", "ATD" 
-               
-               #"SQOL18_RELFAM_SATISF","SQOL18_AMIS_SATISF","SQOL18_VIESENTIM_SATISF"
                )
 
 #transformed variables ???? whilst passive imputation
 new_var <- c(
   
-  #"Comorb",#Y/N"SOMA_1","ATCD_MEDLEG","addict",
-  
   "MARGIN_hx",#No, Past, Current
   
-  #"HDR",#"DUREE_MALADIE", "NBR_HOSPI", "DUREE_HOSPI",
-  
   "Rx"#SGA, FGA, Both, Nil
-  
-  #"SQOL18_REL"#SQOL18_RELFAM_SATISF","SQOL18_AMIS_SATISF","SQOL18_VIESENTIM_SATISF"
-  
-  
 )
 
 #auxiliary variables
-aux_var <- c(
-  
-    # "COMOR_PSY", 
-    # "TS","NBR_TS",#"TS_ANNEE1",
-    # "SIT_FAM_cat", "ETRE_PARENT",
-    # "ADRSSR_cat",
-    # "LGMT_cat",
-    # "SIT_PRO_cat","RQTH",
-    # 
-    # "EGF",
-    # "CGI_SEVERITE",
-    
-    # "SERS_POS",	
-    # "IS_BIRCHWOOD_TTT",
-    # "MARS_TOT",
-    
-    #"MEMCHIF_MCI"
-)
+aux_var <- c()
 
 numeric_col <- c("TIME",
               "AGE_MEDSOC",#"nDIAG2R", "nTTTPSY",
@@ -295,15 +211,16 @@ numeric_col <- c("TIME",
               "ISMI_ALIEN",	"ISMI_APPROB_STEREO",	"ISMI_EXP_DISCRIM",	"ISMI_RET_SOC",	"ISMI_RESIST_STIGMA",	"ISMI_SC_TOT",
               "STORI_MORATOIRE",	"STORI_CONSCIENCE",	"STORI_PREPARATION",	"STORI_RECONSTRUCTION",	"STORI_CROISSANCE",	#"STORI_ST_RETABLISSEMENT",
               "MEMCHIF_MCD", #"MEMCHIF_MCD_STRD",	"MEMCHIF_EMCD",	
-              "MEMCHIF_MCI"#,	"MEMCHIF_MCI_STRD",	"MEMCHIF_EMCI",	
-              #"D2R_CCT_NB",	"D2R_CCT_CENT",	"D2R_E_NB",	"D2R_E_CENT",	"D2R_CC_NB",	"D2R_CC_CENT",
-              #"ACSO",	"MASC_NB",	"MASC_SIGMA",	"AIHQ_HB_NB",	"AIHQ_HB_SIGMA",	"AIHQ_ATTRIB_RESP_NB",	"AIHQ_ATTRIB_RESP_SIGMA",	"AIHQ_AB_NB",	"AIHQ_AB_SIGMA"
+              "MEMCHIF_MCI",#,	"MEMCHIF_MCI_STRD",	"MEMCHIF_EMCI",	
+              "D2R_CCT_NB",	"D2R_CCT_CENT",	"D2R_E_NB",	"D2R_E_CENT",	"D2R_CC_NB",	"D2R_CC_CENT",
+              "ACSO",	"MASC_NB",	"MASC_SIGMA",	"AIHQ_HB_NB",	"AIHQ_HB_SIGMA",	"AIHQ_ATTRIB_RESP_NB",	"AIHQ_ATTRIB_RESP_SIGMA",	"AIHQ_AB_NB",	"AIHQ_AB_SIGMA"
 )
 
 all_NA <- c("","8888,00","Non demandé durant l'entretien","Dunno", "8888.00","Non demandé durant entretien",
             "8888,0","8888.0")
 
-## merged_a/b ----
+# Understand, sort out, anal ----
+## First clean ----
 #Outcome of interest at time==0
 extract02012023_0 <- extract02012023 %>%
   filter(TIME==0) %>%
@@ -322,9 +239,8 @@ if (length(dx_to_keep==1)) {
   extract02012023_0 <- extract02012023_0 %>%
   filter(LISTE_CLASSE_DIAG1R %in% dx_to_keep)
 }
-#TTT voir script WM_Stigma.R 
-# Categorize NLP (FGA and SGA)
 
+#Rx
 NLP1<-unique(with(extract02012023_0,LISTE_DCI_1[LISTE_CLASSE_TTTPSY_1=="(VI)-NEUROLEPTIQUES (ou Antipsychotiques)"]))
 NLP2<-unique(with(extract02012023_0,LISTE_DCI_2[LISTE_CLASSE_TTTPSY_2=="(VI)-NEUROLEPTIQUES (ou Antipsychotiques)"]))
 NLP3<-unique(with(extract02012023_0,LISTE_DCI_3[LISTE_CLASSE_TTTPSY_3=="(VI)-NEUROLEPTIQUES (ou Antipsychotiques)"]))
@@ -359,8 +275,8 @@ who_noRx <- extract02012023_0 %>%
     dplyr::select(StudySubjectID) %>%
     mutate(noRx = 1)
 
-# Combine all categories
-merged_a <- extract02012023_0 %>%
+## merged_ ----
+merged_ <- extract02012023_0 %>%
   #left_join(who_ANX, by = "StudySubjectID") %>%
   # left_join(who_THY, by = "StudySubjectID") %>%
   # left_join(who_ATD, by = "StudySubjectID") %>%
@@ -370,72 +286,63 @@ merged_a <- extract02012023_0 %>%
   # mutate(across(c(ANX, THY, ATD, FGA, SGA), ~ifelse(is.na(.), 0, .))) 
 
 #ADDICTIONS
-# apply categorize_addiction to create the new column
-merged_a$addict <- sapply(merged_a$CONSO_ADDICT, categorize_addiction)
-tmp <- merged_a %>%
-  dplyr::select(CONSO_ADDICT,addict)
-unique(merged_a$NBR_TS)
-
-non_na_counts <- colSums(!is.na(merged_a))
-# Trier les colonnes par ordre décroissant du nombre de valeurs non-NA
-sorted_columns <- sort(non_na_counts, decreasing = TRUE)
-# Afficher les résultats
-print(sorted_columns)
-
-id <- merged_a$StudySubjectID
+# apply categorize_addiction to create a new column
+merged_$addict <- sapply(merged_$CONSO_ADDICT, categorize_addiction)
+id <- merged_$StudySubjectID
 
 # Create a binary outcome variable for missingness
-merged_a$missing_out <- as.numeric(is.na(merged_a %>% dplyr::select(!!sym(varOI))))
-merged_b <- merged_a %>%
+merged_$missing_out <- as.numeric(is.na(merged_ %>% dplyr::select(!!sym(varOI))))
+
+## merged_col_obs ----
+merged_col_obs <- merged_ %>%
   dplyr::select(col_to_keep) %>%
   mutate_if(is.character,~as.factor(.)) 
 
 #explore NA and gross distributions
-merged_b %>% dplyr::select(!where(is.numeric)) %>% map(table, useNA="always")
-merged_b %>% dplyr::select(where(is.numeric)) %>% map(summary)
+merged_col_obs %>% dplyr::select(!where(is.numeric)) %>% map(table, useNA="always")
+merged_col_obs %>% dplyr::select(where(is.numeric)) %>% map(summary)
 
-#what is obvious
+## merged_gp ----
 #regroup centers with small N
 #regroup dx
 #NA if 0-Diagnostic NON ETABLI/NON CONFIRME; ADRSSR_cat=Autre
 #NBR_TS=0 if TS=Non
 #remove EAS
 
-merged_basic <- merged_b
-
+merged_gp <- merged_col_obs
 
 if (length(dx_to_keep)!=1) {
-#group Centre and diag as there are too many levels 
-levels(merged_basic$LISTE_CLASSE_DIAG1R) <- c(levels(merged_basic$LISTE_CLASSE_DIAG1R), "anxiety disorders")
-merged_basic$LISTE_CLASSE_DIAG1R[startsWith(as.character(merged_basic$LISTE_CLASSE_DIAG1R), "5") | 
-                           startsWith(as.character(merged_basic$LISTE_CLASSE_DIAG1R), "6") | 
-                           startsWith(as.character(merged_basic$LISTE_CLASSE_DIAG1R), "7") | 
-                           startsWith(as.character(merged_basic$LISTE_CLASSE_DIAG1R), "8") | 
-                           startsWith(as.character(merged_basic$LISTE_CLASSE_DIAG1R), "9")] <- "anxiety disorders"
-merged_basic$LISTE_CLASSE_DIAG1R[startsWith(as.character(merged_basic$LISTE_CLASSE_DIAG1R), "0")] <- NA
-merged_basic$ADRSSR_cat[startsWith(as.character(merged_basic$ADRSSR_cat), "Autre")] <- NA
+#group dx as there are too many levels 
+levels(merged_gp$LISTE_CLASSE_DIAG1R) <- c(levels(merged_gp$LISTE_CLASSE_DIAG1R), "anxiety disorders")
+merged_gp$LISTE_CLASSE_DIAG1R[startsWith(as.character(merged_gp$LISTE_CLASSE_DIAG1R), "5") | 
+                           startsWith(as.character(merged_gp$LISTE_CLASSE_DIAG1R), "6") | 
+                           startsWith(as.character(merged_gp$LISTE_CLASSE_DIAG1R), "7") | 
+                           startsWith(as.character(merged_gp$LISTE_CLASSE_DIAG1R), "8") | 
+                           startsWith(as.character(merged_gp$LISTE_CLASSE_DIAG1R), "9")] <- "anxiety disorders"
+merged_gp$LISTE_CLASSE_DIAG1R[startsWith(as.character(merged_gp$LISTE_CLASSE_DIAG1R), "0")] <- NA
+merged_gp$ADRSSR_cat[startsWith(as.character(merged_gp$ADRSSR_cat), "Autre")] <- NA
 
-merged_basic <- merged_basic %>%
+merged_gp <- merged_gp %>%
   mutate(LISTE_CLASSE_DIAG1R = fct_other(LISTE_CLASSE_DIAG1R, 
                                          keep = dx_to_keep, 
                                          other_level = "Other")) 
 }
 
-merged_basic$ADRSSR_cat <- droplevels(merged_basic$ADRSSR_cat)
+merged_gp$ADRSSR_cat <- droplevels(merged_gp$ADRSSR_cat)
 
-table(merged_basic$LISTE_CLASSE_DIAG1R, useNA="always")
-table(merged_basic$ADRSSR_cat, useNA="always")
+table(merged_gp$LISTE_CLASSE_DIAG1R, useNA="always")
+table(merged_gp$ADRSSR_cat, useNA="always")
 
-merged_basic$NBR_TS <- ifelse(merged_basic$TS == "Non", 0, merged_basic$NBR_TS)
-table(merged_basic$NBR_TS, useNA="always")
+merged_gp$NBR_TS <- ifelse(merged_gp$TS == "Non", 0, merged_gp$NBR_TS)
+table(merged_gp$NBR_TS, useNA="always")
 
 #create an "other" level for all categories that are less than 50
-merged_basic <- merged_basic %>%
+merged_gp <- merged_gp %>%
   mutate(CENTRE = fct_other(CENTRE,
                             keep = names(table(CENTRE))[table(CENTRE) >= 50]))
-table(merged_basic$CENTRE, useNA="always") 
+table(merged_gp$CENTRE, useNA="always") 
 
-merged_basicRegp <- merged_basic %>%
+merged_gp <- merged_gp %>%
   # mutate(Comorb = case_when(
   #   SOMA_1 == "Non" & addict == "none" & ATCD_MEDLEG == "Non" ~ "N",
   #   SOMA_1 == "Oui" | (addict != "none" & !is.na(addict)) | ATCD_MEDLEG == "Oui" ~ "Y",
@@ -469,9 +376,9 @@ merged_basicRegp <- merged_basic %>%
   dplyr::select(all_of(col_to_keep),-all_of(old_var), all_of(new_var))
 
 #relevel ADRESSR_cat
-merged_basicRegp$ADRSSR_cat <- relevel(merged_basicRegp$ADRSSR_cat, ref="Professionnel de santé du secteur public") 
+merged_gp$ADRSSR_cat <- relevel(merged_gp$ADRSSR_cat, ref="Professionnel de santé du secteur public") 
 
-#plot var-outcome (inc.missing) ----
+## plot var-outcome (inc.missing) ----
 if (plot_var_outcome) {
 # Function to create appropriate plot based on variable type
 plot_variable <- function(data, x_var, y_var) {
@@ -493,37 +400,39 @@ plot_variable <- function(data, x_var, y_var) {
 plot_list <- list()
 
 # Loop through all predictor variables
-for (var in colnames(merged_basicRegp)) {
-  plot_list[[var]] <- plot_variable(merged_basicRegp, var, "missing_out")
+for (var in colnames(merged_gp)) {
+  plot_list[[var]] <- plot_variable(merged_gp, var, "missing_out")
 }
 plot_list[[2]]
-for (var in colnames(merged_basicRegp)) {
-  plot <- plot_variable(merged_basicRegp, var, "missing_out")
+for (var in colnames(merged_gp)) {
+  plot <- plot_variable(merged_gp, var, "missing_out")
   print(plot)
   #readline(prompt="Press [enter] to continue")
 }
 }
 
-#select cases ----
+## merged_ignore ----
 #based on n_miss in case and calculate attrition weights 
-miss_case_summary_obs <- try_missing(merged_basicRegp)
+miss_case_summary_obs <- try_missing(merged_gp)
 #eg observations with more than 30% NA
 keep_id <- miss_case_summary_obs %>%
   filter(pct_miss<=p_miss_indiv) %>%
   dplyr::select(case) %>% unlist
-merged_basicRegp[keep_id,] -> merged_basicRegp
+merged_ignore <- merged_gp[keep_id,] 
 
-#study NA pattern ----
-md_pattern <- md.pattern(merged_basicRegp)
+## calculate attrition weights ----
+#if p_miss_indiv=100 you can pass this.
+
+## merged_imputed ----
+md_pattern <- md.pattern(merged_ignore)
 write.csv(md_pattern,"md_pattern.csv")
-md.pairs(merged_basicRegp)
-(fx <- flux(merged_basicRegp)); print(fx)
+md.pairs(merged_ignore)
+(fx <- flux(merged_ignore)); print(fx)
 plot(fx$influx, fx$outflux, xlim = c(0, 1), ylim = c(0, 1),
      xlab = "Influx", ylab = "Outflux", main = "Flux Plot")
 text(fx$influx, fx$outflux, row.names(fx), pos = 4, cex = 0.8)
 
-# Perform a dry run ----
-dryrun <- mice(merged_basicRegp, maxit = 0, print = FALSE)
+dryrun <- mice(merged_ignore, maxit = 0, print = FALSE)
 
 # Inspect the results
 # 1. Check the imputation methods chosen for each variable
@@ -539,20 +448,19 @@ print(dryrun$nmis)
 #Remove any constant and collinear variables before imputation.
 print(dryrun$loggedEvents)
 
-#create folds ----
-custom_folds <- createFolds(merged_basicRegp$missing_out, k = k_outer, returnTrain = TRUE)
+##loop over outer folds ----
+custom_folds <- createFolds(merged_ignore$missing_out, k = k_outer, returnTrain = TRUE)
 
-#loop over outer folds
 for (outer_idx in 1:k_outer) {
   ##run mice with ignore argument- #train will be FALSE, test will be TRUE
-  train_data <- merged_basicRegp[custom_folds[[outer_idx]],]
-  test_data <- merged_basicRegp[-custom_folds[[outer_idx]],]
+  train_data <- merged_ignore[custom_folds[[outer_idx]],]
+  test_data <- merged_ignore[-custom_folds[[outer_idx]],]
   
-  logical_vector <- rep(TRUE, nrow(merged_basicRegp))
+  logical_vector <- rep(TRUE, nrow(merged_ignore))
   logical_vector[custom_folds[[outer_idx]]] <- FALSE
   
   ##Method 1 when ignore=FALSE(training set), imputation model will use the observation
-  merged_imputed <- mice(merged_basicRegp, m = m, maxit=maxit, ignore=logical_vector, seed=1, print = FALSE)#
+  merged_imputed <- mice(merged_ignore, m = m, maxit=maxit, ignore=logical_vector, seed=1, print = FALSE)#
   
   ## Imputation dx ----
   warnings()
@@ -595,8 +503,6 @@ for (outer_idx in 1:k_outer) {
     )
     summary(test)
   
-    
-    ## SHAP ----
     sl_fit <- SuperLearner(Y = imp.train$missing_out, 
                            X = imp.train %>% dplyr::select(-missing_out),
                            cvControl =list(V=V, stratifyCV=TRUE),
@@ -618,6 +524,7 @@ for (outer_idx in 1:k_outer) {
     print(paste("AUC:", auc))
     print(paste("Accuracy:", accuracy))
     
+    ## SHAP ----
     pred_wrapper <- function(object, newdata) {
       predict(object, newdata = newdata)$pred %>% as.vector
     }
