@@ -1,4 +1,6 @@
 # Clean raw data then run SuperLearner algorithm to predict missing rehab outcome data at t0 based on background factors
+# includes multiple imputations of missing data in background factors
+# also includes calculation of attrition weights (if removing observations of missing values)
 
 # HDR ----
 
