@@ -27,33 +27,30 @@ When referred, patients are seen by
 - background factor
 - typical cleaning procedure, e.g. regroup levels that have less than 30 observations in variables
 - Variables  
-              "CENTRE",# the patient's rehabilitation center
-              "AGE_MEDSOC",#age
-              "SEXE",#sex
-              "NIVETUD_cat",
-              
-              "COMOR_PSY", 
-              "Rx",#"FGA", "SGA", "noRx",#"ANX", "THY", "ATD", 
-              "addict",
-              "SOMA_1",
-              "TTTSOMA_1",
-              "EGF",	
-              "CGI_SEVERITE",
-           
-              "SIT_FAM_cat",
-              "ETRE_PARENT",
-              "ADRSSR_cat",
-              "LGMT_cat",
-              "SIT_PRO_cat",
-              "RQTH",
-              "DUREE_MALADIE",
-              "NBR_HOSPI",
-              "DUREE_HOSPI",
-              "TS",
-              "NBR_TS",#
-              "MARGIN_ACTPASS",
-              "ATCD_MEDLEG",
-
+              "CENTRE",# the patient's rehabilitation center  
+              "AGE_MEDSOC",#age  
+              "SEXE",#sex  
+              "NIVETUD_cat",#level of education                
+              "COMOR_PSY", #presence or absence of psychiatric comorbity  
+              "Rx",# being on FGA, SGA, both or none   
+              "addict", #having a behavioural or substance addiction comorbity  
+              "SOMA_1", #having a physical comorbity  
+              "TTTSOMA_1", #being on treatment for a physical problem  
+              "EGF",	#Global Assessment of Functioning score  
+              "CGI_SEVERITE", #Clinical Global Impression score  
+              "SIT_FAM_cat", #Marital status  
+              "ETRE_PARENT",#Being a parent  
+              "ADRSSR_cat",#which structure referred this patient to the rehab center  
+              "LGMT_cat",#what type of accomodation does the patient lives in  
+              "SIT_PRO_cat",#what is their professional status  
+              "RQTH",#do they have a current status of disabled worker  
+              "DUREE_MALADIE",#how long have they been psychiatrically ill  
+              "NBR_HOSPI",#how many times have they been admitted in psychiatry  
+              "DUREE_HOSPI",#how long have they been admitted in psychiatry  
+              "TS",#have they ever tried to commit suicide?  
+              "NBR_TS",#how many times have they tried to commit suicide?  
+              "MARGIN_ACTPASS",#have they been marginalized (of no fixed above) currently or in the past  
+              "ATCD_MEDLEG",#do they have a forensic history  
 
 # Strategy for missing data
 - re- missing data in predictors, we plan on imputing missing data using R package mice
