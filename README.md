@@ -3,7 +3,7 @@ Missing data in observational research is a curse
 Ideally, missing data would be predicted as soon as patient is referred to the service  
 Patient comes with background factors: Age Sexe Hx Rx etc ...  
 Can these background factors be used to predict the occurence of missing values?  
-Good Predictions of the occurence of missing values based on background factors may 
+Good Predictions of the occurence of missing values based on background factors may  
 1- inform clinicians on whether their next patient may be at risk of missing values, and therefore act accordingly (e.g. by re-calling patients)  
 2- Identifying predictors of missingness helps researchers understand potential biases in their data and develop strategies to minimize missing data in future studies  
 3- Improving data quality would lead to more accurate treatment effect estimates in research studies  
@@ -26,7 +26,33 @@ When referred, patients are seen by
 - as collected in REHABase
 - background factor
 - typical cleaning procedure, e.g. regroup levels that have less than 30 observations in variables
-- Variables
+- Variables  
+              "CENTRE",# the patient's rehabilitation center  
+              "AGE_MEDSOC",#age  
+              "SEXE",#sex  
+              "NIVETUD_cat",
+              
+              "COMOR_PSY", 
+              "Rx",#"FGA", "SGA", "noRx",#"ANX", "THY", "ATD", 
+              "addict",
+              "SOMA_1",
+              "TTTSOMA_1",
+              "EGF",	
+              "CGI_SEVERITE",
+           
+              "SIT_FAM_cat",
+              "ETRE_PARENT",
+              "ADRSSR_cat",
+              "LGMT_cat",
+              "SIT_PRO_cat",
+              "RQTH",
+              "DUREE_MALADIE",
+              "NBR_HOSPI",
+              "DUREE_HOSPI",
+              "TS",
+              "NBR_TS",#
+              "MARGIN_ACTPASS",
+              "ATCD_MEDLEG",
 
 
 # Strategy for missing data
