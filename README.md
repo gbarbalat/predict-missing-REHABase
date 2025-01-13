@@ -26,11 +26,21 @@ When referred, patients are seen by
 - as collected in REHABase
 - background factor
 - typical cleaning procedure, e.g. regroup levels that have less than 30 observations in variables
-- re- missing data in predictors, we plan on imputing missing data
-- amount to keep will depend on various parameters such as: outflux-influx plot, fmi/lambda parameters, pct of missing values in observations. Ideally, we'll keep all missing observations.
-- For instance, we'll most likely remove variables that are on the right handside corner of the outflux-influx plot; we'll carefully inspect fraction of missing information and lambda parameters so that included variables do not increase the variability of coefficients over imputed datasets; if missing values occur over a very large proportions of predictors, we'll have to remove the observation itself.
-- for instance, if all variables in a participants are missing, we're not going to keep that observation. Same if only age or sex are non-missing.
-- in case where observations are discarded while  
+- Variables
 
-# Analysis  
+
+# Strategy for missing data
+- re- missing data in predictors, we plan on imputing missing data using R package mice
+- amount to keep will depend on various parameters such as: outflux-influx plot, fmi/lambda parameters, pct of missing values in observations. Ideally, we'll keep all missing observations.
+- For instance, we'll most likely remove variables that are on the right handside corner of the outflux-influx plot; we'll carefully inspect fraction of missing information and lambda parameters so that included  variables do not increase the variability of coefficients over imputed datasets; if missing values occur over a very large proportions of predictors, we'll have to remove the observation itself.
+- for instance, if all variables in a participants are missing, we're not going to keep that observation. Probably similarly if only age or sex are non-missing.
+- in case where observations are discarded while there are still _some_ predictors (more than simply age or sex), then we'll calculate attrition weights using a SuperLearner prediction of being included in the study given observed variables
+- auxiliary variables: we are not planning on using auxiliary variables simply because all variables roughly have the same amount of missing values. None can be useful as auxiliary variable.
+- regarding the number of imputations m, we'll use the rule of thumb m=%age of missing data
+- regarding the number of iterations maxit, we'll use maxit=20
+- regarding the imputation model, we'll use mice standard argument (pmm for continuous variables, logreg for binary variables and polyreg for categorical non-binary variables)
+
+# 
+
+# SuperLearner predictions  
 
