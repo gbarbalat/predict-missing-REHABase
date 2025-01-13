@@ -1,5 +1,3 @@
-# Analysis plan
-
 # Background
 Missing data in observational research is a curse  
 Ideally, missing data would be predicted as soon as patient is referred to the service  
@@ -27,8 +25,12 @@ When referred, patients are seen by
 # Data  
 - as collected in REHABase
 - background factor
-- typical cleaning procedure
-- 
+- typical cleaning procedure, e.g. regroup levels that have less than 30 observations in variables
+- re- missing data in predictors, we plan on imputing missing data
+- amount to keep will depend on various parameters such as: outflux-influx plot, fmi/lambda parameters, pct of missing values in observations. Ideally, we'll keep all missing observations.
+- For instance, we'll most likely remove variables that are on the right handside corner of the outflux-influx plot; we'll carefully inspect fraction of missing information and lambda parameters so that included variables do not increase the variability of coefficients over imputed datasets; if missing values occur over a very large proportions of predictors, we'll have to remove the observation itself.
+- for instance, if all variables in a participants are missing, we're not going to keep that observation. Same if only age or sex are non-missing.
+- in case where observations are discarded while  
 
 # Analysis  
 
