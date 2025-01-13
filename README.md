@@ -27,9 +27,9 @@ When referred, patients are seen by
 - background factor
 - typical cleaning procedure, e.g. regroup levels that have less than 30 observations in variables
 - Variables  
-              "CENTRE",# the patient's rehabilitation center  
-              "AGE_MEDSOC",#age  
-              "SEXE",#sex  
+              "CENTRE",# the patient's rehabilitation center
+              "AGE_MEDSOC",#age
+              "SEXE",#sex
               "NIVETUD_cat",
               
               "COMOR_PSY", 
