@@ -21,7 +21,7 @@ When referred, patients are seen by
 # RQ
 1- Can missing rehab outcome data at baseline at a one year be predicted based on background factors?  
 2- What are the specific influence of these background factors on missingness?  
-3- Do the predictive model and variable importance vary per diagnosis group and questionnaire/test missing?  
+3- Do the predictive model and variable importance vary per diagnosis group and questionnaire/test missing, at baseline and at t1?  
 
 # Data  
 - as collected in REHABase
