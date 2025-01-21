@@ -73,8 +73,9 @@ When referred, patients are seen by
 - based on Philipps' (2021) guidelines, we aim to use V= 20 folds
 - we'll use the option stratifyCV=TRUE so that the outcome rate is identical across folds 
 - We'll use the CIMENT server of the university of Grenoble, France, hoping that such an aggressive strategy will be handled without any overwhelming of resources
-- If resources do become overwhelmed, then we'll decrease V (e.g. to 10 folds), and or decrease the number of algorithms/screens (e.g. we won't use screening algorithms when using regression regularization)  
-
+- If resources do become overwhelmed, then we'll decrease V (e.g. to 10 folds), and or decrease the number of algorithms/screens (e.g. we won't use screening algorithms when using regression regularization)
+- To better understand whether missing values make the calculation of predictive accuracy and importance values unstable, we'll calculate the sd/variance/range of predictive accuracy and importance values across imputed datasets
+   
 # Variable importance
 - Using the fastshap R package, SHAP value will be calculated for each fold and each training observation (using nsim=100)
 - SHAP plots will be made with the shapviz R package 
