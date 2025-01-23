@@ -19,9 +19,10 @@ When referred, patients are seen by
 4- Then rehab outcomes (and possibly neuropsych data) are re-assessed after one or many interventions are run and most often at 1 year
 
 # RQ
-1- Can missing rehab outcome data at baseline at a one year be predicted based on background factors?  
+1- Can missing rehab outcome data at baseline be predicted based on background factors?  
 2- What are the specific influence of these background factors on missingness?  
-3- Do the predictive model and variable importance vary per diagnosis group and questionnaire/test missing, at baseline and at t1?  
+3- Do the predictive model and variable importance vary per diagnosis group and questionnaire/test missing 
+We will not be able to run the analysis at t1 as there are too many missing values (>90% - wouldn't make any sense to better understand determinants of missing values when the number of missing values is so high). Thus the analysis will be run at baseline (t0) only.
 
 # Data  
 - as collected in REHABase
