@@ -26,7 +26,7 @@ We will not be able to run the analysis at t1 as there are too many missing valu
 
 # Data  
 - as collected in REHABase
-- background factor
+- background factors
 - typical cleaning procedure, e.g. regroup levels that have less than 30 observations in variables
 - Variables  
               "CENTRE",# the patient's rehabilitation center  
@@ -87,10 +87,10 @@ We'll specify set.seed=123 each time a seed is requested
 
 # sensitvity analysis  
 - With/Without variables with high FMI/lambda (on pre-test: duration and number of psych. admission, duration of illness)
-- Variable level of missing values in the final dataset
-- 
+- Variable amount of missing values in the final dataset depending on the parameters mentioned above
 
 # Results
 - Calculate fit over 30 imputed datasets
 - Calculate SHAP values over 30 imputed datasets
+- Detect potential interactions using SHAP values and the shapviz::sv_interaction() function
 
