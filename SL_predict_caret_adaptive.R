@@ -1,26 +1,15 @@
-#happens that screen.glmnet => no variables selected ==> gives an error message!
+#happens that screen.glmnet => no variables selected ==> gives an error message! ==> screen.glmnet removed 
 SL.library <- list("SL.mean",
                    c("SL.caret.xgboost", "All", "screen.mixed", "screen.randomForest"),
                    c("SL.caret.ranger", "All","screen.mixed",  "screen.randomForest"),
-                   #c("SL.rpart", "All","screen.mixed",   "screen.randomForest"),#bratMachine not working with caret
+                   #c("SL.rpart", "All","screen.mixed",   "screen.randomForest"),#bratMachine not working with caret, rpart somehow useless 
                    #c("SL.caret.ksvm", "All","screen.mixed",  "screen.randomForest"),#pbs with predictions in caret
                    c("SL.caret.naive_bayes", "All", "screen.mixed", "screen.randomForest"),
-                   #c("SL.caret.earth", "All", "screen.mixed", "screen.randomForest"),#only for age ....
+                   #c("SL.caret.earth", "All", "screen.mixed", "screen.randomForest"),#only for cont predictors....
                    c("SL.caret.glm", "All", "screen.mixed", "screen.randomForest"),
                    c("SL.caret.step.interaction", "screen.mixed", "screen.randomForest"),#,
                    c("SL.caret.glmnet", "All", "screen.mixed",  "screen.randomForest")
 )
-
-# SL.library <- list(c("SL.caret.rpart", "All", "screen.mixed", "screen.glmnet", "screen.randomForest"))
-#SL.library <- list(c("SL.caret.bartMachine", "All", "screen.mixed","screen.randomForest"))
-#SL.library <- list(c("SL.ksvm"))
-# SL.library <- list(c("SL.caret.gam_cts",  "All"))
-#SL.library <- list(c("SL.caret.xgboost", "All", "screen.mixed",  "screen.glmnet", "screen.randomForest"))
-# SL.library <- list(c("SL.caret.earth", "All","screen.mixed", "screen.randomForest")
-#                    #c("SL.caret.ksvm", "All","screen.mixed",  "screen.randomForest")
-#                    )
-
-
 
 # SL fns using caret ----
 screen.corP <- function (Y, X, family, obsWeights, id, method = "pearson", minPvalue = 0.2, 
