@@ -81,5 +81,5 @@
 
 *   FMI/lambda not used as criteria to select variables as we did not carry out standard glm analysis.
 *   All observations and variables were kept.
-*   Questioned 2 variables with large SHAP range (esp. in lower end of the distribution): "NBR_HOSPI", "DUREE_HOSPI". May want to re-do analysis w/o these variables. (Incidentally, those variables also had large FMI/lambda values and other variables had low FMI/lambda values).
+*   Questioned 2 variables with large SHAP range (esp. in lower end of the distribution): `"NBR_HOSPI"`, `"DUREE_HOSPI"`. May want to re-do analysis w/o these variables. (Incidentally, those variables also had large FMI/lambda values and other variables had low FMI/lambda values).
 *   Due to computational issues, we had to restrict to outer data partition instead of outer cross-validation (CV); training set = 70% of dataset; inner CV based on V=8 folds.
