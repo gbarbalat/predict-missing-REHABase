@@ -1,4 +1,4 @@
-**# Background**
+# Background
 
 *   Missing data is a key issue in observational research.
 *   Aim: Predict missing rehab outcomes using background factors at referral.
@@ -9,7 +9,7 @@
     *   **Nuanced Interpretation**: Allow for more nuanced interpretation of study findings, acknowledging potential biases or limitations
     *   **Service user profiling**: Analyzing predictors of missingness can provide valuable information about the profiles of service users and their engagement with rehabilitation programs
 
-**# REHABase**
+# REHABase
 
 *   Multicentric French rehab database.
 *   Data collected upon referral:
@@ -18,14 +18,14 @@
     3.  **Neuropsychologist**: Neuropsychological data (IQ, attention, etc.).
 *   Rehab outcomes reassessed at follow-up (often 1 year).
 
-**# RQ (Research Questions)**
+# RQ (Research Questions)
 
 1.  Can baseline missing rehab outcome data in SCZ be predicted from background?
 2.  What is the specific influence of background factors on missingness?
 3.  Does the model/variable importance vary per questionnaire/test?
 *   Analysis at baseline (T0) only, due to excessive missing data at T1.
 
-**# Data**
+# Data
 
 *   From REHABase.
 *   Background factors (see list below).
@@ -33,7 +33,7 @@
 *   **Variables**:
     *   `"CENTRE"`, `"AGE_MEDSOC"`, `"SEXE"`, `"NIVETUD_cat"`, `"COMOR_PSY"`, `"Rx"`, `"addict"`, `"SOMA_1"`, `"TTTSOMA_1"`, `"EGF"`, `"CGI_SEVERITE"`, `"SIT_FAM_cat"`, `"ETRE_PARENT"`, `"ADRSSR_cat"`, `"LGMT_cat"`, `"SIT_PRO_cat"`, `"RQTH"`, `"DUREE_MALADIE"`, `"NBR_HOSPI"`, `"DUREE_HOSPI"`, `"TS"`, `"NBR_TS"`, `"MARGIN_ACTPASS"`, `"ATCD_MEDLEG"`
 
-**# Strategy for missing data**
+# Strategy for missing data
 
 *   **Imputation**: Use R `mice` package.
     *   Keep observations (if possible based on outflux-influx plots and the lambda parameter).
@@ -43,7 +43,7 @@
 *   `m` = % missing data. `maxit` = 20. Standard `mice` imputation models.
 *   **Split sample**: Imputation will precede predictive modeling and will be done separately in each training vs. testing sets using the ignore argument in the mice function
 
-**# Predictive modeling**
+# Predictive modeling
 
 *   SuperLearner ensemble model (R `SuperLearner` package).
 *   Basis learners: glm, glm+interactions, regularized regression, MARS, RF, XGBoost, SVM.
@@ -55,16 +55,16 @@
 *   Assess stability of accuracy/importance by calculating SD across imputed datasets.
 *   Training (70-80%) / Testing split.
 
-**# Variable importance**
+# Variable importance
 
 *   `fastshap` R package: SHAP values (nsim=100) for each fold and training observation.
 *   SHAP plots with `shapviz` R package.
 
-**# set.seed**
+# set.seed
 
 *   `set.seed=123`.
 
-**# Sensitivity analysis**
+# Sensitivity analysis
 
 *   With/Without variables with high FMI/lambda.
 *   Varying missing data amount based on parameters.
