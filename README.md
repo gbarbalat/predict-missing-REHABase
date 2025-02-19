@@ -14,7 +14,7 @@
 *   Multicentric French rehab database.
 *   Data collected upon referral:
     1.  **Physician**: Background data (age, sex, history, etc.).
-    2.  **Nurse**: Rehab outcomes at baseline (well-being, QoL, etc.).
+    2.  **Nurse**: Rehab outcomes (well-being, QoL, etc.).
     3.  **Neuropsychologist**: Neuropsychological data (IQ, attention, etc.).
 *   Rehab outcomes reassessed at follow-up (often 1 year).
 
@@ -28,12 +28,14 @@
 # Data
 
 *   From REHABase.
-*   Background factors (see list below).
+*   Background factors (see variable list below).
 *   Typical cleaning (regrouping rare levels).
 *   **Variables**:
     *   `"CENTRE"`, `"AGE_MEDSOC"`, `"SEXE"`, `"NIVETUD_cat"`, `"COMOR_PSY"`, `"Rx"`, `"addict"`, `"SOMA_1"`, `"TTTSOMA_1"`, `"EGF"`, `"CGI_SEVERITE"`, `"SIT_FAM_cat"`, `"ETRE_PARENT"`, `"ADRSSR_cat"`, `"LGMT_cat"`, `"SIT_PRO_cat"`, `"RQTH"`, `"DUREE_MALADIE"`, `"NBR_HOSPI"`, `"DUREE_HOSPI"`, `"TS"`, `"NBR_TS"`, `"MARGIN_ACTPASS"`, `"ATCD_MEDLEG"`
 
-# Strategy for missing data
+# Initial analysis plan
+
+## Strategy for missing data
 
 *   **Imputation**: Use R `mice` package.
     *   Keep observations (if possible based on outflux-influx plots and the lambda parameter).
@@ -69,7 +71,7 @@
 *   With/Without variables with high FMI/lambda.
 *   Varying missing data amount based on parameters.
 
-**# Results**
+# Results**
 
 *   Fit calculated over 30 imputed datasets.
 *   SHAP values calculated over 30 imputed datasets.
