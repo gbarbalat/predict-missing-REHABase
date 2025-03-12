@@ -39,7 +39,7 @@
 
 *   **Imputation**: Use R `mice` package.
     *   Keep observations (if possible based on outflux-influx plots and the lambda parameter).
-    *   Discard observations with near full missingness (if only age and sex are available).
+    *   Discard observations with full missingness.
     *   If some predictors remain, calculate attrition weights using SuperLearner.
 *   **Auxiliary variables**: Not planned, due to similar missingness across variables.
 *   `m` = % missing data. `maxit` = 20. Standard `mice` imputation models.
@@ -79,8 +79,8 @@
 
 # Changes to the initial analysis plan
 
-*   FMI/lambda not used as criteria to select variables as we did not carry out standard glm analysis.
 *   All observations and variables were kept.
-*   Questioned 2 variables with large SHAP range (esp. in lower end of the distribution): `"NBR_HOSPI"`, `"DUREE_HOSPI"`. May want to re-do analysis w/o these variables. (Incidentally, those variables also had large FMI/lambda values and other variables had low FMI/lambda values).
+*   Questioned 2 variables with large SHAP range (esp. in lower end of the distribution): `"NBR_HOSPI"`, `"DUREE_HOSPI"`. Have re-done analysis w/o these variables. Incidentally, those variables also had large FMI/lambda values and other variables had low FMI/lambda values.
 *   Due to increased computational time, we had to restrict to outer data partition instead of outer cross-validation (CV); training set = 70% of dataset; inner CV based on V=8 folds. Do to increased computational time, we had to refrain from using a glm interaction algorithm without any pre-screen.  `rpart` was excluded from our library of basis learners to decrease computational time and because it consistently yielded poor predictive accuracy on pre-tests.
-*   The following algorithms were not used due to unexplained `R caret` errors: `SVM`, `bartMachine`. `earth` was not used because only `Age` was a continuous predictor. `glmnet` pre-screen was not utilized because it resulted in zero predictor selected and incurred errors. 
+*   The following algorithms were not used due to unexplained `R caret` errors: `SVM`, `bartMachine`. `earth` was not used because only `Age` was a continuous predictor. `glmnet` pre-screen was not utilized because it resulted in zero predictor selected.
+*   SHAP interaction analysis using `shapviz::sv_interaction()` was omitted due to time constraints and lower priority in the current study scope.
